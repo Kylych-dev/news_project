@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create News</title>
+    <!-- Подключение стилей -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <!-- Форма создания новости -->
+    <h1>Create News</h1>
+    <form id="create-news-form">
+        <!-- CSRF токен для безопасности -->
+        {% csrf_token %}
+        <!-- Поля для заголовка, текста и изображения новости -->
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="text">Text:</label><br>
+        <textarea id="text" name="text"></textarea><br>
+        <label for="image">Image:</label><br>
+        <input type="file" id="image" name="image"><br>
+        <!-- Поле для тегов новости -->
+        <label for="tags">Tags (separated by commas):</label><br>
+        <input type="text" id="tags" name="tags"><br><br>
+        <!-- Кнопка для отправки формы -->
+        <button type="submit">Create</button>
+    </form>
+    <!-- Скрипт для отправки данных формы через AJAX -->
+    <script>
+        document.getElementById('create-news-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Предотвращаем отправку формы по умолчанию
+
+            // Создаем объект FormData для передачи данных формы
+            var formData = new FormData(this);
+
+            // Отправляем POST запрос через AJAX
+            fetch('/api/v1/news/create/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}' // Добавляем CSRF токен в заголовки
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('News created successfully'); // Выводим сообщение об успешном создании новости
+                    window.location.href = '/news/'; // Перенаправляем пользователя на страницу с новостями
+                } else {
+                    alert('Failed to create news'); // Выводим сообщение об ошибке при создании новости
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
